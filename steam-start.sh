@@ -1,51 +1,57 @@
 #!/bin/bash
 
-CHASSIS_TYPE="Desktop"
+IS_LAPTOP=0
 HAS_OPTIMUS_SUPPORT=0
-AC_POWER="on"
+BATT_STATE="Unknown"
+STEAM_FRAME_FORCE_CLOSE=1
+ALLOW_VSYNC_OFF=0
+GPU_VENDOR="intel"
+STEAM_EXECUTABLE="/usr/lib/steam/steam"
 
-echo " >>> Determining the settings..."
+# Fix for loosing focus in BPM after exiting a game
+export SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS=0
 
-# Check if it' a LAPTOP
-if [ -d "/sys/module/battery" ]; then
-    CHASSIS_TYPE="Laptop"
-    AC_POWER=$(acpi -a | cut -d' ' -f3 | cut -d- -f1)
+export VERSION_ID="1"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-/usr/lib}:/usr/lib32"
+
+if [ -d "/sys/class/power_supply/BAT0" ]; then
+    IS_LAPTOP=1
+    BATT_STATE=$(cat /sys/class/power_supply/BAT0/status)
+
+    echo "Battery state is '$BATT_STATE'"
+
+    if [ "$GPU_VENDOR" == "nvidia" ]; then
+        if [ -d "/usr/bin/bumblebeed" ]; then
+            HAS_OPTIMUS_SUPPORT=1
+        fi
+
+        if [ "$BATT_STATE" == "Unknown" ] && [ $ALLOW_VSYNC_OFF == 1 ]; then
+            export vblank_mode=0
+            echo "Framelimit (vblank) turned off"
+        else
+            export vblank_mode=1
+            echo "Framelimit (vblank) turned on"
+        fi
+    fi
 fi
 
-if [ -d "/usr/bin/bumblebeed" ]; then
-    HAS_OPTIMUS_SUPPORT=1
+
+if [ "$STEAM_RUNTIME" != "0" ]; then
+    export SSL_CERT_DIR="/etc/ssl/certs"
+    #export LD_PRELOAD='/usr/$LIB/libstdc++.so.6 /usr/$LIB/libgcc_s.so.1 /usr/$LIB/libxcb.so.1 /usr/$LIB/libgpg-error.so'
+    #export LD_PRELOAD='./libcxxrt.so:/usr/$LIB/libstdc++.so.6'
+
+    echo "SSL_CERT_DIR set to '$SSL_CERT_DIR'"
+    #echo "LD_PRELOAD set to '$LD_PRELOAD'"
 fi
 
-if [ $AC_POWER = "on" ]; then
-    vblank_mode=0
-fi
-
-if [ -z "$STEAM_RUNTIME" ]; then
-    STEAM_RUNTIME=0
-fi
-
-### PRINT THE OPTIONS
-
-if [ $vblank_mode == 0 ]; then
-    echo " >>> VSync is turned OFF"
+if [ $IS_LAPTOP ] && [ $HAS_OPTIMUS_SUPPORT ]; then
+    if [ "$BATT_STATE" == "Unknown" ] && [ $STEAM_RUNTIME = 0 ]; then
+        optiprime $STEAM_EXECUTABLE
+    fi
 else
-    echo " >>> VSync is turned ON"
-fi
-
-if [ $STEAM_RUNTIME == 0 ]; then
-    echo " >>> Using the NATIVE runtime libraries"
-else
-    echo " >>> Using the STEAM runtime libraries"
-fi
-
-echo " >>> LD_PRELOAD=$LD_PRELOAD"
-
-if [ $CHASSIS_TYPE = "Laptop" ] && [ $AC_POWER = "on" ]; then
-    echo " >>> Running Steam with the dedicated NVIDIA graphics card"
-    optiprime steam
-else
-    echo " >>> Running Steam with the default graphics card"
-    steam
+    $STEAM_EXECUTABLE $* -fulldesktopres
 fi
 
 exit
+
