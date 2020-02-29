@@ -35,7 +35,6 @@ if [ -d "/sys/class/power_supply/BAT0" ]; then
     fi
 fi
 
-
 if [ "$STEAM_RUNTIME" != "0" ]; then
     export SSL_CERT_DIR="/etc/ssl/certs"
     #export LD_PRELOAD='/usr/$LIB/libstdc++.so.6 /usr/$LIB/libgcc_s.so.1 /usr/$LIB/libxcb.so.1 /usr/$LIB/libgpg-error.so'
@@ -45,13 +44,10 @@ if [ "$STEAM_RUNTIME" != "0" ]; then
     #echo "LD_PRELOAD set to '$LD_PRELOAD'"
 fi
 
-if [ $IS_LAPTOP ] && [ $HAS_OPTIMUS_SUPPORT ]; then
-    if [ "$BATT_STATE" == "Unknown" ] && [ $STEAM_RUNTIME = 0 ]; then
-        optiprime $STEAM_EXECUTABLE
-    fi
+if [ $IS_LAPTOP ] && [ $HAS_OPTIMUS_SUPPORT ] && [ "$BATT_STATE" == "Unknown" ] && [ $STEAM_RUNTIME = 0 ]; then
+    optiprime $STEAM_EXECUTABLE
 else
     $STEAM_EXECUTABLE $* -fulldesktopres
 fi
 
 exit
-
