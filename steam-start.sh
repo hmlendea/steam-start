@@ -40,6 +40,8 @@ if [ -d "/sys/class/power_supply/BAT0" ]; then
     fi
 fi
 
+[ ! -z "${STEAM_RUNTIME}" ] && echo "STEAM_RUNTIME=${STEAM_RUNTIME}"
+
 if [ "$STEAM_RUNTIME" != "0" ]; then
     export SSL_CERT_DIR="/etc/ssl/certs"
     #export LD_PRELOAD='/usr/$LIB/libstdc++.so.6 /usr/$LIB/libgcc_s.so.1 /usr/$LIB/libxcb.so.1 /usr/$LIB/libgpg-error.so'
