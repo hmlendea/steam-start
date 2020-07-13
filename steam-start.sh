@@ -14,6 +14,10 @@ export SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS=0
 export VERSION_ID="1"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-/usr/lib}:/usr/lib32"
 
+[ $(lspci | grep "VGA" | grep "NVIDIA" -c) -ge 1 ] && GPU_VENDOR="nvidia"
+
+echo "GPU Vendor: ${GPU_VENDOR}"
+
 if [ -d "/sys/class/power_supply/BAT0" ]; then
     IS_LAPTOP=1
     BATT_STATE=$(cat /sys/class/power_supply/BAT0/status)
@@ -21,7 +25,8 @@ if [ -d "/sys/class/power_supply/BAT0" ]; then
     echo "Battery state is '$BATT_STATE'"
 
     if [ "$GPU_VENDOR" == "nvidia" ]; then
-        if [ -d "/usr/bin/bumblebeed" ]; then
+        if [ -f "/usr/bin/bumblebeed" ]; then
+            echo "OPTIMUS support detected..."
             HAS_OPTIMUS_SUPPORT=1
         fi
 
@@ -44,9 +49,11 @@ if [ "$STEAM_RUNTIME" != "0" ]; then
     #echo "LD_PRELOAD set to '$LD_PRELOAD'"
 fi
 
-if [ $IS_LAPTOP ] && [ $HAS_OPTIMUS_SUPPORT ] && [ "$BATT_STATE" == "Unknown" ] && [ $STEAM_RUNTIME = 0 ]; then
+if [ $IS_LAPTOP ] && [ $HAS_OPTIMUS_SUPPORT ] && [ "$BATT_STATE" != "Discharging" ] && [ $STEAM_RUNTIME = 0 ]; then
+    echo optiprime
     optiprime $STEAM_EXECUTABLE
 else
+    echo steam
     $STEAM_EXECUTABLE $* -fulldesktopres
 fi
 
