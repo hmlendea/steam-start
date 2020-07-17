@@ -6,7 +6,8 @@ BATT_STATE="Unknown"
 STEAM_FRAME_FORCE_CLOSE=1
 ALLOW_VSYNC_OFF=0
 GPU_VENDOR="intel"
-CPU_MODEL_NUMBER=$(cat /proc/cpuinfo | grep model | head -n 1 | awk -F: '{print $2}' | sed 's/ //g')
+CPU_VENDOR=$(cat /proc/cpuinfo | grep "^vendor_id" | head -n 1 | awk -F: '{print $2}' | sed 's/ //g' | sed 's/^Genuine//g')
+CPU_MODEL_NUMBER=$(cat /proc/cpuinfo | grep "^model" | head -n 1 | awk -F: '{print $2}' | sed 's/ //g')
 STEAM_EXECUTABLE="/usr/lib/steam/steam"
 
 # Fix for loosing focus in BPM after exiting a game
@@ -52,8 +53,8 @@ if [ "$STEAM_RUNTIME" != "0" ]; then
     #echo "LD_PRELOAD set to '$LD_PRELOAD'"
 fi
 
-if [ ${CPU_MODEL_NUMBER} -le 58 ]; then
-    echo "DXVK disabled for this CPU"
+if [ "${CPU_VENDOR}" == "Intel" ] && [ ${CPU_MODEL_NUMBER} -le 58 ]; then
+    echo "DXVK disabled for this CPU (${CPU_VENDOR} model ${CPU_MODEL_NUMBER})"
     PROTON_USE_WINED3D=1
 fi
 
