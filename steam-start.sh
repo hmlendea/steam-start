@@ -55,7 +55,7 @@ fi
 
 if [ "${CPU_VENDOR}" == "Intel" ] && [ ${CPU_MODEL_NUMBER} -le 58 ]; then
     echo "DXVK disabled for this CPU (${CPU_VENDOR} model ${CPU_MODEL_NUMBER})"
-    PROTON_USE_WINED3D=1
+    export PROTON_USE_WINED3D=1
 fi
 
 if [ $IS_LAPTOP ] && [ $HAS_OPTIMUS_SUPPORT ] && [ "$BATT_STATE" != "Discharging" ]; then # && [ $STEAM_RUNTIME = 0 ]; then
