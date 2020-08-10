@@ -1,7 +1,7 @@
 #!/bin/bash
 
-IS_LAPTOP=0
-HAS_OPTIMUS_SUPPORT=0
+IS_LAPTOP=false
+HAS_OPTIMUS_SUPPORT=false
 BATT_STATE="Unknown"
 STEAM_FRAME_FORCE_CLOSE=1
 ALLOW_VSYNC_OFF=0
@@ -21,7 +21,7 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-/usr/lib}:/usr/lib32"
 echo "GPU Vendor: ${GPU_VENDOR}"
 
 if [ -d "/sys/class/power_supply/BAT0" ]; then
-    IS_LAPTOP=1
+    IS_LAPTOP=true
     BATT_STATE=$(cat /sys/class/power_supply/BAT0/status)
 
     echo "Battery state is '$BATT_STATE'"
@@ -29,7 +29,7 @@ if [ -d "/sys/class/power_supply/BAT0" ]; then
     if [ "$GPU_VENDOR" == "nvidia" ]; then
         if [ -f "/usr/bin/bumblebeed" ]; then
             echo "OPTIMUS support detected..."
-            HAS_OPTIMUS_SUPPORT=1
+            HAS_OPTIMUS_SUPPORT=true
         fi
 
         if [ "$BATT_STATE" == "Unknown" ] && [ $ALLOW_VSYNC_OFF == 1 ]; then
@@ -58,7 +58,7 @@ if [ "${CPU_VENDOR}" == "Intel" ] && [ ${CPU_MODEL_NUMBER} -le 58 ]; then
     export PROTON_USE_WINED3D=1
 fi
 
-if [ $IS_LAPTOP ] && [ $HAS_OPTIMUS_SUPPORT ] && [ "$BATT_STATE" != "Discharging" ]; then # && [ $STEAM_RUNTIME = 0 ]; then
+if ${IS_LAPTOP} && ${HAS_OPTIMUS_SUPPORT} && [ ${BATT_STATE} != "Discharging" ]; then # && [ $STEAM_RUNTIME = 0 ]; then
     optiprime $STEAM_EXECUTABLE
 else
     $STEAM_EXECUTABLE $* -fulldesktopres
