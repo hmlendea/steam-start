@@ -1,3 +1,3 @@
-[![Build Status](https://travis-ci.com/hmlendea/steam-start.svg?branch=master)](https://travis-ci.com/hmlendea/steam-start)
+[![Build Status](https://github.com/hmlendea/steam-start/actions/workflows/bash.yml/badge.svg)](https://github.com/hmlendea/steam-start/actions/workflows/bash.yml)
 
 # steam-start
