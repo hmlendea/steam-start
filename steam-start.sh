@@ -22,9 +22,9 @@ echo "GPU Vendor: ${GPU_VENDOR}"
 
 function set_var() {
     VARIABLE_NAME="${1}"
-    VARIABLE_VALUE="${2}"
+    VARIABLE_VALUE="${@:2}"
 
-    export ${VARIABLE_NAME}=${VARIABLE_VALUE}
+    export ${VARIABLE_NAME}="${VARIABLE_VALUE}"
 
     echo "Variable '${VARIABLE_NAME}' set to '${VARIABLE_VALUE}'"
 }
@@ -42,7 +42,7 @@ if [ -d "/sys/class/power_supply/BAT0" ]; then
         fi
 
         if [ "$BATT_STATE" == "Unknown" ] && [ $ALLOW_VSYNC_OFF == 1 ]; then
-            set_var vblank_mode=0
+            set_var vblank_mode 0
         else
             set_var vblank_mode 1
         fi
@@ -53,7 +53,10 @@ fi
 
 if [ "$STEAM_RUNTIME" != "0" ]; then
     set_var SSL_CERT_DIR "/etc/ssl/certs"
-    #set_var LD_PRELOAD '/usr/$LIB/libstdc++.so.6 /usr/$LIB/libgcc_s.so.1 /usr/$LIB/libxcb.so.1 /usr/$LIB/libgpg-error.so'
+
+    # Fixes some games (e.g. Insurgency)
+    set_var LD_PRELOAD '/usr/$LIB/libstdc++.so.6 /usr/$LIB/libgcc_s.so.1 /usr/$LIB/libxcb.so.1 /usr/$LIB/libgpg-error.so'
+
     #set_var LD_PRELOAD './libcxxrt.so:/usr/$LIB/libstdc++.so.6'
 fi
 
