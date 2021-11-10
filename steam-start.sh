@@ -1,7 +1,5 @@
 #!/bin/bash
 
-STEAM_FRAME_FORCE_CLOSE=1
-ALLOW_VSYNC_OFF=false
 
 #####################################
 ### Retrieve hardware information ###
@@ -10,6 +8,7 @@ ALLOW_VSYNC_OFF=false
 CHASSIS_TYPE="Desktop"
 BATT_STATE="Unknown"
 HAS_OPTIMUS_SUPPORT=false
+ALLOW_VSYNC_OFF=false
 
 if [ -d "/sys/module/battery" ] \
 && [ -d "/proc/acpi/button/lid" ]; then
@@ -73,6 +72,11 @@ echo " - GPU: ${GPU_NAME}"
 function set_var() {
     local VARIABLE_NAME="${1}"
     local VARIABLE_VALUE="${@:2}"
+    local CURRENT_VALUE=""
+
+    eval CURRENT_VALUE=\$"${VARIABLE_NAME}"
+
+    [[ "${CURRENT_VALUE}" == "${VARIABLE_VALUE}" ]] && return
 
     export ${VARIABLE_NAME}="${VARIABLE_VALUE}"
 
@@ -106,7 +110,9 @@ if [ "${CPU_FAMILY}" == "Intel" ] && [ "${CPU_MODEL}" == "Core i7-3610QM" ]; the
     echo "DXVK does not work on this CPU"
     set_var PROTON_USE_WINED3D 1
 fi
-exit
+
+### Run Steam
+
 if ${HAS_OPTIMUS_SUPPORT} && [ ${BATTERY_STATE} != "Discharging" ]; then # && [ $STEAM_RUNTIME = 0 ]; then
     optiprime $STEAM_EXECUTABLE
 else
