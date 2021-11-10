@@ -1,5 +1,5 @@
 #!/bin/bash
-
+STEAM_EXECUTABLE="/usr/lib/steam/steam"
 
 #####################################
 ### Retrieve hardware information ###
