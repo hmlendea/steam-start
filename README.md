@@ -22,4 +22,4 @@ chmod +x "/usr/bin/steam-start"
 
 Simply run `steam-start` and Steam will start using this script.
 
-**Note**: You can edit Steam's desktop file _(e.g. /usr/share/application/steam.desktop)_ to use `steam-start` as it's `Exec` command, so that clicking the Steam icon on your desktop will use this script
+**Note**: You can edit Steam's desktop file _(e.g. /usr/share/applications/steam.desktop)_ to use `steam-start` as it's `Exec` command, so that clicking the Steam icon on your desktop will use this script
