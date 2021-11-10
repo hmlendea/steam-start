@@ -6,7 +6,7 @@
 #####################################
 
 CHASSIS_TYPE="Desktop"
-BATT_STATE="Unknown"
+BATTERY_STATE="Unknown"
 HAS_OPTIMUS_SUPPORT=false
 ALLOW_VSYNC_OFF=false
 
@@ -17,13 +17,9 @@ if [ -d "/sys/module/battery" ] \
 fi
 
 if [ -f "/usr/bin/lscpu" ]; then
-    CPU_MODEL=$(lscpu | \
-        grep "^Model name:" | \
-        awk -F: '{print $2}')
+    CPU_MODEL=$(lscpu | grep "^Model name:" | awk -F: '{print $2}')
 elif [ -f "/proc/cpuinfo" ]; then
-    CPU_MODEL=$(cat "/proc/cpuinfo" | \
-        grep "^model name" | \
-        awk -F: '{print $2}')
+    CPU_MODEL=$(grep "^model name" "/proc/cpuinfo" | awk -F: '{print $2}')
 fi
 
 CPU_MODEL=$(echo "${CPU_MODEL}" | head -n 1 | sed \
@@ -59,6 +55,7 @@ if [[ "${GPU_FAMILY}" == "Nvidia" ]]; then
 fi
 
 ### Print hardware information
+
 echo "Detected hardware:"
 echo " - Chassis: ${CHASSIS_TYPE}"
 [[ "${CHASSIS_TYPE}" == "Laptop" ]] && echo " - Battery: ${BATTERY_STATE}"
@@ -71,14 +68,14 @@ echo " - GPU: ${GPU_NAME}"
 
 function set_var() {
     local VARIABLE_NAME="${1}"
-    local VARIABLE_VALUE="${@:2}"
+    local VARIABLE_VALUE="${*:2}"
     local CURRENT_VALUE=""
 
     eval CURRENT_VALUE=\$"${VARIABLE_NAME}"
 
     [[ "${CURRENT_VALUE}" == "${VARIABLE_VALUE}" ]] && return
 
-    export ${VARIABLE_NAME}="${VARIABLE_VALUE}"
+    export "${VARIABLE_NAME}"="${VARIABLE_VALUE}"
 
     echo "Variable '${VARIABLE_NAME}' set to '${VARIABLE_VALUE}'"
 }
@@ -113,10 +110,10 @@ fi
 
 ### Run Steam
 
-if ${HAS_OPTIMUS_SUPPORT} && [ ${BATTERY_STATE} != "Discharging" ]; then # && [ $STEAM_RUNTIME = 0 ]; then
-    optiprime $STEAM_EXECUTABLE
+if ${HAS_OPTIMUS_SUPPORT} && [ "${BATTERY_STATE}" != "Discharging" ]; then # && [ $STEAM_RUNTIME = 0 ]; then
+    optiprime "${STEAM_EXECUTABLE}"
 else
-    $STEAM_EXECUTABLE $* -fulldesktopres
+    "${STEAM_EXECUTABLE}" $* -fulldesktopres
 fi
 
 exit
