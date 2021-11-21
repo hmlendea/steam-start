@@ -8,7 +8,7 @@ Script for launching Steam with compatibility fixes and support for Nvidia OPTIM
 
 ## Arch Linux
 
-Install it using [this PKGBUILD](https://github.com/hmlendea/PKGBUILDs/tree/master/pkg/repo-synchroniser).
+Install it using [this PKGBUILD](https://github.com/hmlendea/PKGBUILDs/tree/master/pkg/steam-start).
 
 ## Other distros
 
