@@ -43,8 +43,13 @@ if [ -f "/usr/bin/lspci" ]; then
     echo "${LSPCI_VGA_PRIMARY}" | grep -q "AMD"      && GPU_FAMILY="AMD"
     echo "${LSPCI_VGA_PRIMARY}" | grep -q "Intel"    && GPU_FAMILY="Intel"
     echo "${LSPCI_VGA_PRIMARY}" | grep -q "NVIDIA"   && GPU_FAMILY="Nvidia"
-    
-    GPU_MODEL=$(echo "${LSPCI_VGA_PRIMARY}" | sed 's/^[^\[]*\[\([a-zA-Z0-9 ]*\)].*/\1/g')
+
+    GPU_MODEL=$(echo "${LSPCI_VGA_PRIMARY}" | \
+                sed 's/^[^\[]*\[\([a-zA-Z0-9 ]*\)].*/\1/g' | \
+                sed 's/^00:0[0-9].[0-9] VGA compatible controller: //g' | \
+                sed 's/Corporation //g' | \
+                sed 's/ (rev [0-9][0-9])//g')
+
     GPU_NAME=$(echo "${GPU_FAMILY} ${GPU_MODEL}" | sed 's/^\s*//g')
 fi
 
@@ -109,7 +114,6 @@ if [ "${CPU_FAMILY}" == "Intel" ] && [ "${CPU_MODEL}" == "Core i7-3610QM" ]; the
 fi
 
 ### Run Steam
-
 if ${HAS_OPTIMUS_SUPPORT} && [ "${BATTERY_STATE}" != "Discharging" ]; then # && [ $STEAM_RUNTIME = 0 ]; then
     optiprime "${STEAM_EXECUTABLE}"
 else
