@@ -95,6 +95,7 @@ if [[ "${CHASSIS_TYPE}" == "Laptop" ]]; then
     fi
 fi
 
+set_var WINE_FULLSCREEN_FSR 1 # Enable FSR globally when using Proton GE and the game resolution is below the native one
 set_var SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS 0 # Fix for loosing focus in BPM after exiting a game
 set_var VERSION_ID 1
 set_var LD_LIBRARY_PATH "${LD_LIBRARY_PATH:-/usr/lib}:/usr/lib32"
