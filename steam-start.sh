@@ -43,8 +43,13 @@ if [ -f "/usr/bin/lspci" ]; then
     echo "${LSPCI_VGA_PRIMARY}" | grep -q "AMD"      && GPU_FAMILY="AMD"
     echo "${LSPCI_VGA_PRIMARY}" | grep -q "Intel"    && GPU_FAMILY="Intel"
     echo "${LSPCI_VGA_PRIMARY}" | grep -q "NVIDIA"   && GPU_FAMILY="Nvidia"
-    
-    GPU_MODEL=$(echo "${LSPCI_VGA_PRIMARY}" | sed 's/^[^\[]*\[\([a-zA-Z0-9 ]*\)].*/\1/g')
+
+    GPU_MODEL=$(echo "${LSPCI_VGA_PRIMARY}" | \
+                sed 's/^[^\[]*\[\([a-zA-Z0-9 ]*\)].*/\1/g' | \
+                sed 's/^00:0[0-9].[0-9] VGA compatible controller: //g' | \
+                sed 's/Corporation //g' | \
+                sed 's/ (rev [0-9][0-9])//g')
+
     GPU_NAME=$(echo "${GPU_FAMILY} ${GPU_MODEL}" | sed 's/^\s*//g')
 fi
 
@@ -90,6 +95,7 @@ if [[ "${CHASSIS_TYPE}" == "Laptop" ]]; then
     fi
 fi
 
+set_var WINE_FULLSCREEN_FSR 1 # Enable FSR globally when using Proton GE and the game resolution is below the native one
 set_var SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS 0 # Fix for loosing focus in BPM after exiting a game
 set_var VERSION_ID 1
 set_var LD_LIBRARY_PATH "${LD_LIBRARY_PATH:-/usr/lib}:/usr/lib32"
@@ -109,7 +115,6 @@ if [ "${CPU_FAMILY}" == "Intel" ] && [ "${CPU_MODEL}" == "Core i7-3610QM" ]; the
 fi
 
 ### Run Steam
-
 if ${HAS_OPTIMUS_SUPPORT} && [ "${BATTERY_STATE}" != "Discharging" ]; then # && [ $STEAM_RUNTIME = 0 ]; then
     optiprime "${STEAM_EXECUTABLE}"
 else
